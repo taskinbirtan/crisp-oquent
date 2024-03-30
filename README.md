@@ -5,7 +5,7 @@ Bu projede, TypeScript ve JavaScript kullanılarak bir API istemcisi oluşturulm
 
 ## Özellikler
 
-- `CrispyOquentConfig`: Bu sınıf, API'nin temel URI'sini ve diğer genel ayarları içerir.
+- `CrispOquentConfig`: Bu sınıf, API'nin temel URI'sini ve diğer genel ayarları içerir.
 - `Builder`: Bu sınıf, API'den veri çekmek için kullanılan bir sorgu oluşturucudur. `where` ve `orderBy` gibi metotlarla sorgular oluşturabilir ve `paginate` metoduyla sonuçları sayfalayabilirsiniz.
 - `PaginatedResults`: Bu sınıf, API'den dönen sayfalı sonuçları temsil eder. Toplam sonuç sayısı, mevcut sayfa numarası ve sayfa başına sonuç sayısı gibi bilgileri içerir.
 
@@ -24,10 +24,10 @@ $ npm i crisp-oquent
 ```
 
 ```js
-import {CrispyOquent} from "@crisp-oquent";
+import {CrispOquent} from "@crisp-oquent";
 
 export default defineNuxtPlugin((nuxtApp) => {
-    CrispyOquent.initialize(
+    CrispOquent.initialize(
         {
             baseUri: 'https://bir-tan.com',
         }
