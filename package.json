@@ -1,0 +1,39 @@
+{
+  "name": "crisp-oquent",
+  "version": "1.0.0",
+  "description": "Typescript/Javascript; features mapping + model-builder like JSON API library, using fetch only.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "directories": {
+    "dist": "dist"
+  },
+  "scripts": {
+    "test": "npm run build-dev && mocha -r ts-node/register tests/*.test.ts tests/**/*.test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/taskinbirtan/crisp-oquent.git"
+  },
+  "keywords": [
+    "Typescript",
+    "fetch",
+    "only",
+    "Mapping",
+    "JsonAPI",
+    "query",
+    "builder",
+    "mapping",
+    "javascript",
+    "nuxtjs",
+    "nextjs",
+    "vuejs",
+    "reactjs"
+  ],
+  "author": "Birtan Taskin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/taskinbirtan/crisp-oquent/issues"
+  },
+  "homepage": "https://github.com/taskinbirtan/crisp-oquent#readme"
+}
