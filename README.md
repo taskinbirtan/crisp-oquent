@@ -1,27 +1,28 @@
-
 # Crisp O'quent - NuxtJS
 
-Bu projede, TypeScript ve JavaScript kullanılarak bir API istemcisi oluşturulmuştur. Bu istemci, API'den veri getirmek için kullanılan bir dizi sınıf ve araç içerir.
+In this project, an API client has been created using TypeScript and JavaScript. This client includes a series of classes and tools used to fetch data from the API.
 
-## Özellikler
+## Features
 
-- `CrispOquentConfig`: Bu sınıf, API'nin temel URI'sini ve diğer genel ayarları içerir.
-- `Builder`: Bu sınıf, API'den veri çekmek için kullanılan bir sorgu oluşturucudur. `where` ve `orderBy` gibi metotlarla sorgular oluşturabilir ve `paginate` metoduyla sonuçları sayfalayabilirsiniz.
-- `PaginatedResults`: Bu sınıf, API'den dönen sayfalı sonuçları temsil eder. Toplam sonuç sayısı, mevcut sayfa numarası ve sayfa başına sonuç sayısı gibi bilgileri içerir.
+- `CrispOquentConfig`: This class contains the base URI of the API and other general settings.
+- `Builder`: This class is a query builder used to fetch data from the API. You can create queries with methods like `where` and `orderBy`, and paginate the results with the `paginate` method.
+- `PaginatedResults`: This class represents the paginated results returned from the API. It includes information such as the total number of results, the current page number, and the number of results per page.
 
-## Başlarken
+## Getting Started
 
-Bu projeyi yerel makinenizde çalıştırmak için aşağıdaki adımları izleyin.
+Follow the steps below to run this project on your local machine.
 
-### Önkoşullar
+### Prerequisites
 
-Bu projeyi çalıştırmak için Node.js ve npm'in yüklü olması gerekmektedir.
+You need to have Node.js and npm installed to run this project.
 
-### Nuxt-Js Kurulum + Özelleştirme
+### Nuxt-Js Installation + Customization
 
 ```bash
 $ npm i crisp-oquent
 ```
+
+### Development
 
 ```js
 import {CrispOquent} from "@crisp-oquent";
