@@ -35,3 +35,5 @@ export default defineNuxtPlugin((nuxtApp) => {
     );
 });
 ```
+
+#### To Be Continued, wanna participate?
