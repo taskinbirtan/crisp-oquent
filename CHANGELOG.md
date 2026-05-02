@@ -2,6 +2,20 @@
 
 All notable changes to this project are documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] — 2026-05-02
+
+### Added — full Spatie v7 feature parity
+- `Builder.where(name, FilterOperator, value)` — dynamic operator filter, pairs with `AllowedFilter::operator($name, FilterOperator::DYNAMIC)` on the server. Emits `?filter[name]=>3000`, `?filter[id]=!=3`, etc.
+- `FilterOperator` const object (mirrors `Spatie\QueryBuilder\Enums\FilterOperator`): `EQUAL`, `NOT_EQUAL`, `GREATER_THAN`, `GREATER_THAN_OR_EQUAL`, `LESS_THAN`, `LESS_THAN_OR_EQUAL`.
+- `Builder.withTrashed()` / `Builder.onlyTrashed()` — Spatie SoftDeletes `?filter[trashed]=with|only`.
+- `Builder.whereNull(name)` / `Builder.whereNotNull(name)` — Spatie nullable filter (v7.0.1) shorthand → `?filter[name]=null` / `not-null`.
+- `Builder.includeSum`, `includeAvg`, `includeMin`, `includeMax` — pair with Spatie aggregate includes (`AllowedInclude::sum/avg/min/max`, v7.0.0).
+- `Builder.delimiter(delimiter)` and `CrispOquentConfig.setFilterDelimiter(delimiter)` — override the comma-join delimiter for array filter values, mirroring Spatie's `query-builder.array_value_delimiter` config (v7.2.0).
+- 13 new tests (total: 41) covering every new helper.
+
+### Changed
+- `QueryParams.delimiter` is now a first-class field on the query string builder.
+
 ## [2.0.0] — 2026-05-02
 
 **BREAKING — full rewrite.** The 1.0.0 API surface is not preserved.

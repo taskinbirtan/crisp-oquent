@@ -1,7 +1,8 @@
 export { Model } from './Model.js';
 export type { ModelConstructor } from './Model.js';
 export { Builder } from './builder/Builder.js';
-export type { SortDirection } from './builder/Builder.js';
+export type { SortDirection, TrashedMode } from './builder/Builder.js';
+export { FilterOperator } from './filter-operator.js';
 export {
   PaginatedResults,
   parsePaginated,

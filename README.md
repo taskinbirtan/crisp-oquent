@@ -7,8 +7,8 @@
 
 - **Zero dependencies.** Just `fetch` — no Axios, no polyfills.
 - **ESM-only**, strict TypeScript, ships its own `.d.ts`. Node ≥ 18 and modern browsers.
-- **1:1 with Spatie's URL contract:** `filter[…]`, `sort=`, `include=`, `fields[type]=`, `append=`.
-- **Filter groups:** `filterGroup()` shorthand for server-side `AllowedFilter::groupOr / groupAnd`.
+- **Full Spatie v7 feature parity:** `filter[…]`, dynamic operators, trashed, nullable, sort, include (incl. count/exists/sum/avg/min/max), sparse fieldsets, append.
+- **Filter groups:** `filterGroup()` shorthand for server-side `AllowedFilter::groupOr / groupAnd` (Spatie v7.3.0 / PR [#1060](https://github.com/spatie/laravel-query-builder/pull/1060)).
 - **Laravel-aware pagination** — parses Laravel API Resource paginated responses out of the box.
 - **Auth + interceptors + structured errors:** bearer token, request/response middleware, `HttpError` with helpers like `isValidationError`.
 
@@ -71,7 +71,61 @@ page.hasMorePages(); // true
 page.links.next;     // 'https://api.example.com/users?page=3'
 ```
 
-### 5. Filter Groups (Spatie v7.3.0 — PR #1060)
+### 5. Dynamic operator filters
+
+Pairs with `AllowedFilter::operator($name, FilterOperator::DYNAMIC)` on the server.
+
+```ts
+import { FilterOperator } from 'crisp-oquent';
+
+await User.crispy()
+  .where('salary', FilterOperator.GREATER_THAN, 3000)        // filter[salary]=>3000
+  .where('id', FilterOperator.NOT_EQUAL, 7)                  // filter[id]=!=7
+  .where('created_at', FilterOperator.LESS_THAN_OR_EQUAL, '2026-01-01')
+  .get();
+```
+
+Available operators: `EQUAL`, `NOT_EQUAL`, `GREATER_THAN`, `GREATER_THAN_OR_EQUAL`, `LESS_THAN`, `LESS_THAN_OR_EQUAL`.
+
+### 6. Trashed (SoftDeletes) and nullable filters
+
+```ts
+await User.crispy().withTrashed().get();   // filter[trashed]=with
+await User.crispy().onlyTrashed().get();   // filter[trashed]=only
+
+await User.crispy().whereNull('deleted_at').get();   // filter[deleted_at]=null
+await User.crispy().whereNotNull('email').get();     // filter[email]=not-null
+```
+
+### 7. Aggregate includes (sum / avg / min / max / count / exists)
+
+Pairs with Spatie's `AllowedInclude::sum / avg / min / max / count / exists`. Pass the include name declared on the server.
+
+```ts
+await User.crispy()
+  .includeCount('posts')                    // postsCount
+  .includeExists('friends')                 // friendsExists
+  .includeSum('postsViewsSum')              // postsViewsSum
+  .includeAvg('postsViewsAvg')
+  .includeMin('postsViewsMin')
+  .includeMax('postsViewsMax')
+  .get();
+// → ?include=postsCount,friendsExists,postsViewsSum,postsViewsAvg,postsViewsMin,postsViewsMax
+```
+
+### 8. Custom array delimiter (Spatie v7.2.0)
+
+Mirror your server-side `query-builder.array_value_delimiter` config:
+
+```ts
+CrispOquentConfig.setFilterDelimiter('|');
+await User.crispy().filter('id', [1, 2, 3]).get();   // filter[id]=1|2|3
+
+// Per-builder override:
+await User.crispy().delimiter(';').filter('id', [1, 2]).get();
+```
+
+### 9. Filter Groups (Spatie v7.3.0 — PR #1060)
 
 On the backend:
 
@@ -95,7 +149,7 @@ const matches = await User.crispy().filterGroup('q', 'John').get();
 
 The conjunction (AND/OR), which fields the shorthand fans out to, and value broadcasting all live server-side. The client just sends the shorthand; the composition is owned by `FiltersGroup`.
 
-### 6. Single records & CRUD
+### 10. Single records & CRUD
 
 ```ts
 const user = await User.crispy().find(42);  // GET /users/42 (404 → null)
@@ -112,7 +166,7 @@ await fresh.save();   // PUT /users/:id
 await fresh.delete(); // DELETE /users/:id
 ```
 
-### 7. Auth & interceptors
+### 11. Auth & interceptors
 
 ```ts
 CrispOquentConfig.setBearerToken('abc123');
@@ -133,7 +187,7 @@ CrispOquentConfig.addResponseInterceptor(async (response) => {
 });
 ```
 
-### 8. Error handling
+### 12. Error handling
 
 ```ts
 import { HttpError } from 'crisp-oquent';
@@ -149,18 +203,24 @@ try {
 
 ## API surface — Spatie parity
 
-| Spatie URL parameter   | Builder method                                  |
-|------------------------|-------------------------------------------------|
-| `filter[name]=`        | `.filter(name, value)`                          |
-| `filter[name]=a,b`     | `.filter(name, [a, b])`                         |
-| `filter[shorthand]=`   | `.filterGroup(shorthand, value)` (#1060)        |
-| `sort=`                | `.sortBy(field)` / `.sortByDesc(field)`         |
-| `include=`             | `.include(...rels)`                             |
-| aggregate `xCount`     | `.includeCount(...rels)`                        |
-| aggregate `xExists`    | `.includeExists(...rels)`                       |
-| `fields[type]=`        | `.fields(type, ...names)`                       |
-| `append=`              | `.append(...names)`                             |
-| `page=` + `per_page=`  | `.page(n)` / `.perPage(n)` / `.paginate(p, pp)` |
+| Spatie feature                                | URL emitted                                  | Builder method                                          |
+|-----------------------------------------------|----------------------------------------------|---------------------------------------------------------|
+| Partial / exact / scope / callback filter     | `?filter[name]=…`                            | `.filter(name, value)`                                  |
+| Comma-separated values                        | `?filter[name]=a,b`                          | `.filter(name, [a, b])`                                 |
+| Dynamic operator (`FilterOperator::DYNAMIC`)  | `?filter[salary]=>3000`                      | `.where(name, FilterOperator.GREATER_THAN, value)`      |
+| BelongsTo filter                              | `?filter[post]=1`                            | `.filter('post', value)`                                |
+| Trashed (SoftDeletes)                         | `?filter[trashed]=with` / `only`             | `.withTrashed()` / `.onlyTrashed()`                     |
+| Nullable filter (v7.0.1)                      | `?filter[deleted_at]=null` / `not-null`      | `.whereNull(name)` / `.whereNotNull(name)`              |
+| Custom array delimiter (v7.2.0)               | `?filter[id]=1\|2\|3`                        | `.delimiter('\|')` / `setFilterDelimiter('\|')`         |
+| Filter groups (v7.3.0 / [#1060](https://github.com/spatie/laravel-query-builder/pull/1060)) | `?filter[shorthand]=…`                       | `.filterGroup(shorthand, value)`                        |
+| Sort (multi-field, `-` for desc)              | `?sort=-created_at,name`                     | `.sortBy(field)` / `.sortByDesc(field)`                 |
+| Include relations                             | `?include=posts,profile`                     | `.include(...rels)`                                     |
+| Aggregate include `Count`                     | `?include=postsCount`                        | `.includeCount(...rels)`                                |
+| Aggregate include `Exists`                    | `?include=postsExists`                       | `.includeExists(...rels)`                               |
+| Aggregate include `sum / avg / min / max`     | `?include=postsViewsSum`                     | `.includeSum / Avg / Min / Max(...names)`               |
+| Sparse fieldsets                              | `?fields[users]=id,name`                     | `.fields(type, ...names)`                               |
+| Append accessors                              | `?append=full_name`                          | `.append(...names)`                                     |
+| Pagination (Laravel Resource)                 | `?page=2&per_page=25`                        | `.page(n)` / `.perPage(n)` / `.paginate(p, pp)`         |
 
 ## Compatibility
 

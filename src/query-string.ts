@@ -9,20 +9,23 @@ export interface QueryParams {
   page?: number;
   perPage?: number;
   extra?: Record<string, QueryValue | QueryValue[]>;
+  /** Delimiter used to join array filter values. Default: ',' (Spatie default). */
+  delimiter?: string;
 }
 
 const enc = encodeURIComponent;
 
-function joinValues(value: QueryValue | QueryValue[]): string {
-  return Array.isArray(value) ? value.map(String).join(',') : String(value);
+function joinValues(value: QueryValue | QueryValue[], delimiter: string): string {
+  return Array.isArray(value) ? value.map(String).join(delimiter) : String(value);
 }
 
 export function buildQueryString(params: QueryParams): string {
   const parts: string[] = [];
+  const delimiter = params.delimiter ?? ',';
 
   if (params.filter) {
     for (const [name, value] of Object.entries(params.filter)) {
-      parts.push(`filter[${enc(name)}]=${enc(joinValues(value))}`);
+      parts.push(`filter[${enc(name)}]=${enc(joinValues(value, delimiter))}`);
     }
   }
 
@@ -55,7 +58,7 @@ export function buildQueryString(params: QueryParams): string {
 
   if (params.extra) {
     for (const [name, value] of Object.entries(params.extra)) {
-      parts.push(`${enc(name)}=${enc(joinValues(value))}`);
+      parts.push(`${enc(name)}=${enc(joinValues(value, delimiter))}`);
     }
   }
 

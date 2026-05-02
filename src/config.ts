@@ -20,12 +20,19 @@ export interface CrispOquentOptions {
   fetch: FetchLike;
   requestInterceptors: RequestInterceptor[];
   responseInterceptors: ResponseInterceptor[];
+  /**
+   * Default delimiter for joining array filter values.
+   * Spatie's default is ','. Mirror your server-side
+   * `query-builder.array_value_delimiter` config here.
+   */
+  filterDelimiter: string;
 }
 
 export interface CrispOquentInit {
   baseUri: string;
   headers?: Record<string, string>;
   fetch?: FetchLike;
+  filterDelimiter?: string;
 }
 
 const DEFAULTS: CrispOquentOptions = {
@@ -34,6 +41,7 @@ const DEFAULTS: CrispOquentOptions = {
   fetch: ((...args) => globalThis.fetch(...args)) as FetchLike,
   requestInterceptors: [],
   responseInterceptors: [],
+  filterDelimiter: ',',
 };
 
 export class CrispOquentConfig {
@@ -75,6 +83,10 @@ export class CrispOquentConfig {
 
   static addResponseInterceptor(interceptor: ResponseInterceptor): void {
     this._options.responseInterceptors.push(interceptor);
+  }
+
+  static setFilterDelimiter(delimiter: string): void {
+    this._options.filterDelimiter = delimiter;
   }
 
   static reset(): void {
