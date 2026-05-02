@@ -2,8 +2,8 @@
 
 > A **fetch-only**, TypeScript-first API client that speaks Spatie [`laravel-query-builder`](https://github.com/spatie/laravel-query-builder)'s URL contract — including JSON:API Fancy Filter Groups (Spatie v7.3.0 / PR [#1060](https://github.com/spatie/laravel-query-builder/pull/1060)).
 
-[![npm version](https://img.shields.io/npm/v/crisp-oquent.svg)](https://www.npmjs.com/package/crisp-oquent)
-[![license](https://img.shields.io/npm/l/crisp-oquent.svg)](./LICENSE)
+[![npm version](https://img.shields.io/npm/v/%40bir-tan%2Fcrisp-oquent.svg)](https://www.npmjs.com/package/@bir-tan/crisp-oquent)
+[![license](https://img.shields.io/npm/l/%40bir-tan%2Fcrisp-oquent.svg)](./LICENSE)
 
 - **Zero dependencies.** Just `fetch` — no Axios, no polyfills.
 - **ESM-only**, strict TypeScript, ships its own `.d.ts`. Node ≥ 18 and modern browsers.
@@ -15,7 +15,7 @@
 ## Install
 
 ```bash
-npm install crisp-oquent
+npm install @bir-tan/crisp-oquent
 ```
 
 ## Quick start
@@ -23,7 +23,7 @@ npm install crisp-oquent
 ### 1. Configure once
 
 ```ts
-import { CrispOquentConfig } from 'crisp-oquent';
+import { CrispOquentConfig } from '@bir-tan/crisp-oquent';
 
 CrispOquentConfig.initialize({ baseUri: 'https://api.example.com' });
 CrispOquentConfig.setBearerToken(localStorage.getItem('token'));
@@ -32,7 +32,7 @@ CrispOquentConfig.setBearerToken(localStorage.getItem('token'));
 ### 2. Define a model
 
 ```ts
-import { Model } from 'crisp-oquent';
+import { Model } from '@bir-tan/crisp-oquent';
 
 export class User extends Model {
   static override uri = '/users';
@@ -76,7 +76,7 @@ page.links.next;     // 'https://api.example.com/users?page=3'
 Pairs with `AllowedFilter::operator($name, FilterOperator::DYNAMIC)` on the server.
 
 ```ts
-import { FilterOperator } from 'crisp-oquent';
+import { FilterOperator } from '@bir-tan/crisp-oquent';
 
 await User.crispy()
   .where('salary', FilterOperator.GREATER_THAN, 3000)        // filter[salary]=>3000
@@ -190,7 +190,7 @@ CrispOquentConfig.addResponseInterceptor(async (response) => {
 ### 12. Error handling
 
 ```ts
-import { HttpError } from 'crisp-oquent';
+import { HttpError } from '@bir-tan/crisp-oquent';
 
 try {
   await new User({ email: '' }).save();

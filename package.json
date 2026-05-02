@@ -1,6 +1,9 @@
 {
-  "name": "crisp-oquent",
+  "name": "@bir-tan/crisp-oquent",
   "version": "2.1.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Fetch-only TypeScript API client that speaks Spatie laravel-query-builder's URL contract — fluent Eloquent-style builder with Filter Groups (JSON:API Fancy Filters).",
   "type": "module",
   "main": "./dist/index.js",
