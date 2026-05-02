@@ -1,7 +1,7 @@
 {
   "name": "crisp-oquent",
   "version": "2.0.0",
-  "description": "Spatie laravel-query-builder uyumlu, fetch-only TypeScript API client. Eloquent-vari fluent builder + Filter Groups (JSON:API Fancy Filters).",
+  "description": "Fetch-only TypeScript API client that speaks Spatie laravel-query-builder's URL contract — fluent Eloquent-style builder with Filter Groups (JSON:API Fancy Filters).",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

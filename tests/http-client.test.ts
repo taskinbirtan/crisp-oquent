@@ -5,7 +5,7 @@ import { installFetchMock, jsonResponse } from './helpers.js';
 beforeEach(() => CrispOquentConfig.reset());
 
 describe('HttpClient', () => {
-  it('default headers + Bearer token gönderilir', async () => {
+  it('sends default headers + bearer token', async () => {
     const { calls } = installFetchMock(() => jsonResponse({ ok: true }));
     CrispOquentConfig.setBearerToken('abc123');
     await request('/ping');
@@ -14,7 +14,7 @@ describe('HttpClient', () => {
     expect(headers['Authorization']).toBe('Bearer abc123');
   });
 
-  it('non-2xx → HttpError (status, body, helper)', async () => {
+  it('non-2xx response → HttpError (status, body, helpers)', async () => {
     installFetchMock(() =>
       jsonResponse(
         { message: 'Unprocessable', errors: { email: ['required'] } },
@@ -41,7 +41,7 @@ describe('HttpClient', () => {
     expect(result).toBeUndefined();
   });
 
-  it('request interceptor zinciri çalışır', async () => {
+  it('runs request interceptor chain', async () => {
     const { calls } = installFetchMock(() => jsonResponse({ ok: true }));
     CrispOquentConfig.addRequestInterceptor((ctx) => ({
       ...ctx,
@@ -51,7 +51,7 @@ describe('HttpClient', () => {
     expect((calls[0]!.init.headers as Record<string, string>)['X-Trace']).toBe('on');
   });
 
-  it('absolute URL bypass eder baseUri', async () => {
+  it('absolute URL bypasses baseUri', async () => {
     const { calls } = installFetchMock(() => jsonResponse({}));
     await request('https://other.host/raw');
     expect(calls[0]!.url).toBe('https://other.host/raw');

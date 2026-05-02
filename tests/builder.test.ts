@@ -11,7 +11,7 @@ class User extends Model {
 
 beforeEach(() => CrispOquentConfig.reset());
 
-describe('Builder — Spatie URL kontratı', () => {
+describe('Builder — Spatie URL contract', () => {
   it('get() → /users', async () => {
     const { calls } = installFetchMock(() => jsonResponse({ data: [{ id: 1, name: 'A' }] }));
     const items = await User.crispy().get();
@@ -20,7 +20,7 @@ describe('Builder — Spatie URL kontratı', () => {
     expect(items[0]).toBeInstanceOf(User);
   });
 
-  it('filter + sort + include URL kontratı', async () => {
+  it('filter + sort + include URL contract', async () => {
     const { calls } = installFetchMock(() => jsonResponse({ data: [] }));
     await User.crispy()
       .filter('status', 'active')
@@ -48,7 +48,7 @@ describe('Builder — Spatie URL kontratı', () => {
     expect(new URL(calls[0]!.url).searchParams.get('filter[q]')).toBe('John');
   });
 
-  it('first() → perPage=1, ilk item', async () => {
+  it('first() → perPage=1, returns the first item', async () => {
     const { calls } = installFetchMock(() =>
       jsonResponse({ data: [{ id: 7, name: 'first' }] }),
     );
@@ -73,7 +73,7 @@ describe('Builder — Spatie URL kontratı', () => {
     expect(user).toBeNull();
   });
 
-  it('paginate() Laravel Resource formatını parse eder', async () => {
+  it('paginate() parses Laravel Resource paginated payload', async () => {
     installFetchMock(() =>
       jsonResponse({
         data: [{ id: 1, name: 'A' }, { id: 2, name: 'B' }],
@@ -101,7 +101,7 @@ describe('Model — attribute proxy + CRUD', () => {
     expect(u.isPersisted()).toBe(true);
   });
 
-  it('save() yeni model → POST', async () => {
+  it('save() on new model → POST', async () => {
     const { calls } = installFetchMock(() =>
       jsonResponse({ data: { id: 99, name: 'New', email: 'a@b' } }, 201),
     );
@@ -113,7 +113,7 @@ describe('Model — attribute proxy + CRUD', () => {
     expect(u.getKey()).toBe(99);
   });
 
-  it('save() var olan model → PUT', async () => {
+  it('save() on persisted model → PUT', async () => {
     const { calls } = installFetchMock(() =>
       jsonResponse({ data: { id: 5, name: 'Upd' } }),
     );
@@ -131,7 +131,7 @@ describe('Model — attribute proxy + CRUD', () => {
     expect(calls[0]!.init.method).toBe('DELETE');
   });
 
-  it('Builder.create(payload) → POST + döner instance', async () => {
+  it('Builder.create(payload) → POST and returns instance', async () => {
     installFetchMock(() => jsonResponse({ data: { id: 1, name: 'X' } }, 201));
     const u = await User.crispy().create({ name: 'X' });
     expect(u).toBeInstanceOf(User);

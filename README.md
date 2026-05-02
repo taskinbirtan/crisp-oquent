@@ -1,33 +1,35 @@
 # crisp-oquent
 
-> Spatie [`laravel-query-builder`](https://github.com/spatie/laravel-query-builder) uyumlu, **fetch-only** TypeScript API client. Eloquent-vari fluent builder + JSON:API Fancy Filter Groups (Spatie v7.3.0 / PR [#1060](https://github.com/spatie/laravel-query-builder/pull/1060)).
+> A **fetch-only**, TypeScript-first API client that speaks Spatie [`laravel-query-builder`](https://github.com/spatie/laravel-query-builder)'s URL contract — including JSON:API Fancy Filter Groups (Spatie v7.3.0 / PR [#1060](https://github.com/spatie/laravel-query-builder/pull/1060)).
 
-- Sadece `fetch` — Axios bağımlılığı yok
-- ESM-only, TypeScript-first, Node ≥ 18 ve modern tarayıcılarda çalışır
-- Spatie URL kontratı 1:1: `filter[…]`, `sort=`, `include=`, `fields[type]=`, `append=`
-- Filter groups (`filterGroup`) — Spatie `AllowedFilter::groupOr / groupAnd` shorthand
-- Laravel Resource pagination payload'ını otomatik parse eder
-- Bearer auth, request/response interceptor, `HttpError` ile structured hata
+[![npm version](https://img.shields.io/npm/v/crisp-oquent.svg)](https://www.npmjs.com/package/crisp-oquent)
+[![license](https://img.shields.io/npm/l/crisp-oquent.svg)](./LICENSE)
 
-## Kurulum
+- **Zero dependencies.** Just `fetch` — no Axios, no polyfills.
+- **ESM-only**, strict TypeScript, ships its own `.d.ts`. Node ≥ 18 and modern browsers.
+- **1:1 with Spatie's URL contract:** `filter[…]`, `sort=`, `include=`, `fields[type]=`, `append=`.
+- **Filter groups:** `filterGroup()` shorthand for server-side `AllowedFilter::groupOr / groupAnd`.
+- **Laravel-aware pagination** — parses Laravel API Resource paginated responses out of the box.
+- **Auth + interceptors + structured errors:** bearer token, request/response middleware, `HttpError` with helpers like `isValidationError`.
+
+## Install
 
 ```bash
-npm i crisp-oquent
+npm install crisp-oquent
 ```
 
-## Hızlı Başlangıç
+## Quick start
 
-### 1. Config
+### 1. Configure once
 
 ```ts
-// nuxt.config.ts içindeki bir plugin, app entry, vb.
 import { CrispOquentConfig } from 'crisp-oquent';
 
 CrispOquentConfig.initialize({ baseUri: 'https://api.example.com' });
 CrispOquentConfig.setBearerToken(localStorage.getItem('token'));
 ```
 
-### 2. Model tanımı
+### 2. Define a model
 
 ```ts
 import { Model } from 'crisp-oquent';
@@ -41,7 +43,7 @@ export class User extends Model {
 }
 ```
 
-### 3. Sorgular — Spatie URL kontratı
+### 3. Fluent queries — Spatie URL contract
 
 ```ts
 const users = await User.crispy()
@@ -71,7 +73,7 @@ page.links.next;     // 'https://api.example.com/users?page=3'
 
 ### 5. Filter Groups (Spatie v7.3.0 — PR #1060)
 
-Backend'de:
+On the backend:
 
 ```php
 QueryBuilder::for(User::class)
@@ -83,7 +85,7 @@ QueryBuilder::for(User::class)
     );
 ```
 
-Client'ta tek satır:
+On the client, one line:
 
 ```ts
 const matches = await User.crispy().filterGroup('q', 'John').get();
@@ -91,9 +93,9 @@ const matches = await User.crispy().filterGroup('q', 'John').get();
 // → backend WHERE (name LIKE '%John%' OR full_name LIKE '%John%')
 ```
 
-Conjunction (AND/OR), shorthand'ın hangi alanlara dağılacağı, value broadcast — hepsi server-side. Client'ın tek görevi shorthand'i göndermek; mantık `FiltersGroup` içinde.
+The conjunction (AND/OR), which fields the shorthand fans out to, and value broadcasting all live server-side. The client just sends the shorthand; the composition is owned by `FiltersGroup`.
 
-### 6. Tek kayıt + CRUD
+### 6. Single records & CRUD
 
 ```ts
 const user = await User.crispy().find(42);  // GET /users/42 (404 → null)
@@ -110,25 +112,28 @@ await fresh.save();   // PUT /users/:id
 await fresh.delete(); // DELETE /users/:id
 ```
 
-### 7. Auth + interceptor
+### 7. Auth & interceptors
 
 ```ts
 CrispOquentConfig.setBearerToken('abc123');
 
 CrispOquentConfig.addRequestInterceptor((ctx) => ({
   ...ctx,
-  init: { ...ctx.init, headers: { ...ctx.init.headers, 'X-Trace-Id': crypto.randomUUID() } },
+  init: {
+    ...ctx.init,
+    headers: { ...ctx.init.headers, 'X-Trace-Id': crypto.randomUUID() },
+  },
 }));
 
 CrispOquentConfig.addResponseInterceptor(async (response) => {
   if (response.status === 401) {
-    // refresh, redirect, vs.
+    // refresh, redirect, …
   }
   return response;
 });
 ```
 
-### 8. Hata modeli
+### 8. Error handling
 
 ```ts
 import { HttpError } from 'crisp-oquent';
@@ -142,9 +147,9 @@ try {
 }
 ```
 
-## API kapsamı — Spatie paritesi
+## API surface — Spatie parity
 
-| Spatie URL parametresi | Builder metodu                                  |
+| Spatie URL parameter   | Builder method                                  |
 |------------------------|-------------------------------------------------|
 | `filter[name]=`        | `.filter(name, value)`                          |
 | `filter[name]=a,b`     | `.filter(name, [a, b])`                         |
@@ -157,7 +162,13 @@ try {
 | `append=`              | `.append(...names)`                             |
 | `page=` + `per_page=`  | `.page(n)` / `.perPage(n)` / `.paginate(p, pp)` |
 
-## Geliştirme
+## Compatibility
+
+- **Node:** ≥ 18 (uses native `fetch`)
+- **Bundlers / frameworks:** Vite, Webpack 5+, Rollup, esbuild — Nuxt 3, Next.js 13+, Vue 3, React 18+, SvelteKit
+- **Backend:** Laravel + Spatie `laravel-query-builder` ≥ 7.0 (Filter Groups require ≥ 7.3.0)
+
+## Development
 
 ```bash
 npm install
@@ -166,6 +177,10 @@ npm test
 npm run build
 ```
 
-## Lisans
+## Contributing
 
-Apache-2.0
+Issues and pull requests welcome on [GitHub](https://github.com/taskinbirtan/crisp-oquent). For Spatie URL contract questions, please link to the relevant `laravel-query-builder` documentation or PR.
+
+## License
+
+[Apache-2.0](./LICENSE)
