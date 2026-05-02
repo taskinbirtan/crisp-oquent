@@ -1,39 +1,61 @@
 {
   "name": "crisp-oquent",
-  "version": "1.0.0",
-  "description": "Typescript/Javascript; features mapping + model-builder like JSON API library, using fetch only.",
+  "version": "2.0.0",
+  "description": "Spatie laravel-query-builder uyumlu, fetch-only TypeScript API client. Eloquent-vari fluent builder + Filter Groups (JSON:API Fancy Filters).",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "directories": {
-    "dist": "dist"
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "sideEffects": false,
   "scripts": {
-    "test": "npm run build-dev && mocha -r ts-node/register tests/*.test.ts tests/**/*.test.ts"
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/taskinbirtan/crisp-oquent.git"
   },
   "keywords": [
-    "Typescript",
+    "typescript",
     "fetch",
-    "only",
-    "Mapping",
-    "JsonAPI",
-    "query",
-    "builder",
-    "mapping",
-    "javascript",
-    "nuxtjs",
-    "nextjs",
-    "vuejs",
-    "reactjs"
+    "laravel",
+    "spatie",
+    "query-builder",
+    "eloquent",
+    "json-api",
+    "api-client",
+    "nuxt",
+    "next",
+    "vue",
+    "react"
   ],
   "author": "Birtan Taskin",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/taskinbirtan/crisp-oquent/issues"
   },
-  "homepage": "https://github.com/taskinbirtan/crisp-oquent#readme"
+  "homepage": "https://github.com/taskinbirtan/crisp-oquent#readme",
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
 }

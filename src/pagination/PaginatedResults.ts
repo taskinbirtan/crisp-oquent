@@ -1,62 +1,91 @@
-import {Model} from "../Model";
+import type { Model, ModelConstructor } from '../Model.js';
 
-interface IPaginateMeta<T> {
-    items: T[];
-    total: number;
-    currentPage: number;
-    perPage: number;
-    links: {
-        first: string;
-        last: string;
-        prev: string;
-    };
+export interface PaginationLinks {
+  first: string | null;
+  last: string | null;
+  prev: string | null;
+  next: string | null;
 }
 
-class PaginatedResults<T> {
-    constructor(private data: IPaginateMeta<T>) {
-    }
-
-    get items(): T[] {
-        return this.data.items;
-    }
-
-    get total(): number {
-        return this.data.total;
-    }
-
-    get currentPage(): number {
-        return this.data.currentPage;
-    }
-
-    get links(): {
-        first: string;
-        last: string;
-        prev: string;
-    } {
-        return this.data.links;
-    }
-
-    get perPage(): number {
-        return this.data.perPage;
-    }
+export interface PaginationMeta {
+  currentPage: number;
+  perPage: number;
+  total: number;
+  lastPage: number;
+  from: number | null;
+  to: number | null;
 }
 
-function parseResults<T extends Model>(data: any): { pagination: IPaginateMeta<T>; data: T[] } {
-    const parsedData: T[] = data.data.data.map((item: any) => new Model(item));
-
-    const meta = data.data;
-    const paginationInfo: IPaginateMeta<any> = {
-        total: meta.total,
-        links: meta.links,
-        currentPage: meta.current_page,
-        perPage: meta.per_page,
-        items: parsedData,
-    };
-
-    return {
-        data: parsedData,
-        pagination: paginationInfo
-    };
+export interface RawLaravelPaginated {
+  data: Array<Record<string, unknown>>;
+  links?: Partial<PaginationLinks>;
+  meta?: {
+    current_page?: number;
+    per_page?: number;
+    total?: number;
+    last_page?: number;
+    from?: number | null;
+    to?: number | null;
+  };
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
+  from?: number | null;
+  to?: number | null;
 }
 
-export {PaginatedResults, parseResults};
+export class PaginatedResults<T extends Model> {
+  constructor(
+    readonly items: T[],
+    readonly meta: PaginationMeta,
+    readonly links: PaginationLinks,
+  ) {}
+
+  get total(): number {
+    return this.meta.total;
+  }
+
+  get currentPage(): number {
+    return this.meta.currentPage;
+  }
+
+  get perPage(): number {
+    return this.meta.perPage;
+  }
+
+  get lastPage(): number {
+    return this.meta.lastPage;
+  }
+
+  hasMorePages(): boolean {
+    return this.meta.currentPage < this.meta.lastPage;
+  }
+}
+
+export function parsePaginated<T extends Model>(
+  raw: RawLaravelPaginated,
+  modelClass: ModelConstructor<T>,
+): PaginatedResults<T> {
+  const items = (raw.data ?? []).map((item) => new modelClass(item));
+  const metaSource = raw.meta ?? raw;
+  const linksSource = raw.links ?? {};
+
+  const meta: PaginationMeta = {
+    currentPage: metaSource.current_page ?? 1,
+    perPage: metaSource.per_page ?? items.length,
+    total: metaSource.total ?? items.length,
+    lastPage: metaSource.last_page ?? 1,
+    from: metaSource.from ?? null,
+    to: metaSource.to ?? null,
+  };
+
+  const links: PaginationLinks = {
+    first: linksSource.first ?? null,
+    last: linksSource.last ?? null,
+    prev: linksSource.prev ?? null,
+    next: linksSource.next ?? null,
+  };
+
+  return new PaginatedResults<T>(items, meta, links);
+}

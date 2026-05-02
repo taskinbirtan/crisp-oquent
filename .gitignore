@@ -1,9 +1,9 @@
-**/*.js
-**/*.js.map
-**/*.d.ts
 node_modules
 dist
+coverage
+*.tsbuildinfo
 
 .idea
 !.idea/codeStyleSettings.xml
 *.iml
+.DS_Store
